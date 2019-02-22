@@ -1,0 +1,358 @@
+create table animal_group (
+   animal_group varchar(50) not null primary key,
+   active tinyint(1) default 1)
+ENGINE=INNODB;
+
+insert into animal_group values('CATTLE', 1);
+insert into animal_group values('SHEEP', 1);
+insert into animal_group values('GOATS', 1);
+
+create table breed (
+   animal_group varchar(50) not null,
+   breed varchar(50) not null,
+   active tinyint(1) default 1,
+   primary key(animal_group, breed),
+   foreign key (animal_group) references animal_group(animal_group) 
+      on update cascade)
+ENGINE=INNODB;
+
+insert into breed values ('CATTLE', 'N/A', 1);
+insert into breed values ('SHEEP', 'N/A', 1);
+insert into breed values ('GOATS', 'N/A', 1);
+
+create table sub_group (
+   animal_group varchar(50) not null,
+   sub_group varchar(50) not null,
+   active tinyint(1) default 1,
+   primary key(animal_group, sub_group),
+   foreign key (animal_group) references animal_group(animal_group) 
+      on update cascade)
+ENGINE=INNODB;
+
+insert into sub_group values ('CATTLE', 'N/A', 1);
+insert into sub_group values ('SHEEP', 'N/A', 1);
+insert into sub_group values ('GOATS', 'N/A', 1);
+
+create table origin (
+   origin varchar(200) not null primary key,
+   active tinyint(1) default 1)
+ENGINE=INNODB;
+
+create table animal (
+   id int not null auto_increment primary key,
+   animal_id varchar(50) not null,
+   animal_group varchar(50) not null,
+   breed varchar(50) not null,
+   sub_group varchar(50) not null,
+   gender char(1) not null,
+   birthdate date not null,
+   origin varchar(100),
+   mother varchar(50) not null,
+   father varchar(50) not null,
+   name varchar(50) not null,
+   markings varchar(200),
+   filename varchar(200) default null,
+   alive tinyint(1) default 1,
+   comments text,
+   foreign key (animal_group) references animal_group(animal_group)
+      on update cascade,
+   foreign key (animal_group, breed) references breed(animal_group, breed)
+      on update cascade,
+   foreign key (animal_group, sub_group) references sub_group(animal_group, sub_group)
+      on update cascade,
+   foreign key (origin) references origin(origin)
+      on update cascade,
+   unique (animal_id))
+ENGINE=INNODB;
+
+create table reason (
+   reason varchar(50) not null primary key,
+   active tinyint(1) default 1)
+ENGINE=INNODB;
+
+create table users (
+   username varchar(50) primary key,
+   admin tinyint(1) default 0,
+   active tinyint(1) default 1)
+ENGINE=INNODB;
+
+create table ext_users (
+   username varchar(50) primary key,
+   passwd varchar(130) not null,
+   foreign key (username) references users(username) 
+      on update cascade)
+ENGINE=INNODB;
+
+create table vet (
+   id int not null auto_increment primary key,
+   care_date date,
+   animal_id varchar(50) not null,
+   reason varchar(50) not null,  
+   symptoms text,
+   temperature varchar(3) default 'N/A',
+   care text,
+   weight varchar(4) default 'N/A',
+   vet varchar(100) default 'N/A',
+   contact varchar(7),
+   assistants varchar(100) default 'N/A',
+   comments text,
+   userid varchar(50) not null,
+   foreign key (animal_id) references animal(animal_id)
+      on update cascade,
+   foreign key (userid) references users(username)
+      on update cascade,
+   foreign key (reason) references reason(reason)
+      on update cascade)
+ENGINE=INNODB;
+
+create table medication (
+   medication varchar(100) not null primary key,
+   dosage varchar(100) default 'N/A',
+   active tinyint(1) default 1)
+ENGINE=INNODB;
+
+create table meds_given (
+   id int not null,
+   medication varchar(100) not null,
+   units varchar(5),
+   units_given float not null,
+   foreign key (id) references vet(id),
+   foreign key (medication) references medication(medication)
+      on update cascade)
+ENGINE=INNODB;
+
+create table egg_log (
+   id int not null auto_increment primary key,
+   coll_date date,
+   number int not null,
+   comments text)
+ENGINE=INNODB;
+
+create table wormer (
+   wormer varchar(100) not null primary key,
+   active tinyint(1) default 1)
+ENGINE=INNODB;
+
+create table sheep_care (
+   id int not null auto_increment primary key,
+   care_date date,
+   animal_id varchar(50) not null,
+   eye int not null,
+   body int not null,
+   tail varchar(6) not null,
+   nose varchar(100) not null,
+   coat varchar(100) not null,
+   jaw int not null,
+   wormer varchar(100) not null,
+   wormer_quantity varchar(100) not null,
+   hoof varchar(4) not null,
+   trim varchar(3) not null,
+   weight int not null,
+   estimated varchar(9) not null,
+   comments text)
+ENGINE=INNODB;
+
+create table forage (
+   forage varchar(100) not null primary key,
+   density float not null,
+   active tinyint(1) default 1)
+ENGINE=INNODB;
+   
+create table paddock (
+   paddock_id varchar(50) not null primary key,
+   forage varchar(100) not null,
+   size float not null,
+   active tinyint(1) default 1,
+   foreign key (forage) references forage(forage) on update cascade)
+ENGINE=INNODB;
+
+create table move (
+   id int not null auto_increment primary key,
+   move_to tinyint(1) default 1,
+   move_date date,
+   animal_group varchar(50) not null,
+   sub_group varchar(50) not null,
+   paddock_id varchar(50) not null,
+   forage varchar(100) not null,
+   height int not null,
+   density int not null,
+   comments text,
+   foreign key (paddock_id) references paddock(paddock_id) on update cascade,
+   foreign key (forage) references forage(forage) on update cascade,
+   foreign key (animal_group, sub_group) references sub_group(animal_group, sub_group)
+      on update cascade,
+   foreign key (animal_group) references animal_group(animal_group) 
+      on update cascade)
+ENGINE=INNODB;
+
+create table notes (
+   id int not null auto_increment primary key,
+   note_date date,
+   note text,
+   userid varchar(50) not null,
+   filename varchar(200) default null,
+   foreign key (userid) references users(username)
+      on update cascade)
+ENGINE=INNODB;
+
+create table destination (
+   destination varchar(200) not null primary key,
+   active tinyint(1) default 1)
+ENGINE=INNODB;
+
+create table sale (
+   id int not null auto_increment primary key,
+   animal_id varchar(50) not null,
+   sale_tag varchar(50) not null,
+   destination varchar(200) not null,
+   sale_date date,
+   weight int not null,
+   estimated varchar(9) not null,
+   price_lb numeric(8, 2),
+   fees numeric(6, 2),
+   comments text,
+   unique (animal_id),
+   foreign key (animal_id) references animal(animal_id)
+      on update cascade,
+   foreign key (destination) references destination(destination)
+      on update cascade)
+ENGINE=INNODB;
+
+create table slay_house (
+   slay_house varchar(200) not null primary key,
+   active tinyint(1) default 1)
+ENGINE=INNODB;
+
+create table slaughter (
+   id int not null auto_increment primary key,
+   animal_id varchar(50) not null,
+   sale_tag varchar(50) not null,
+   slay_house varchar(200) not null,
+   hauler varchar(200) not null,
+   haul_equip varchar(200) not null,
+   slay_date date,
+   weight int not null,
+   estimated varchar(9) not null,
+   fees numeric(5, 2),
+   comments text,
+   unique (animal_id),
+   foreign key (animal_id) references animal(animal_id)
+      on update cascade,
+   foreign key (slay_house) references slay_house(slay_house)
+      on update cascade)
+ENGINE=INNODB;
+
+create table other_dest (
+   destination varchar(200) not null primary key,
+   active tinyint(1) default 1)
+ENGINE=INNODB;
+
+create table other_reason (
+   reason varchar(50) not null primary key,
+   active tinyint(1) default 1)
+ENGINE=INNODB;
+
+create table other_remove (
+   id int not null auto_increment primary key,
+   animal_id varchar(50) not null,
+   remove_date date,
+   reason varchar(50) not null,
+   destination varchar(200) not null,
+   weight varchar(20) not null,
+   comments text,
+   unique (animal_id),
+   foreign key (animal_id) references animal(animal_id)
+      on update cascade,
+   foreign key (reason) references other_reason(reason)
+      on update cascade,
+   foreign key (destination) references other_dest(destination)
+      on update cascade)
+ENGINE=INNODB;
+
+create table feed_type (
+   type varchar(50) not null primary key,
+   active tinyint(1) default 1)
+ENGINE=INNODB;
+
+create table feed_subtype (
+   type varchar(50) not null,
+   subtype varchar(50) not null,
+   active tinyint(1) default 1,
+   primary key (type, subtype),
+   foreign key (type) references feed_type(type)
+      on update cascade)
+ENGINE=INNODB;
+
+create table feed_units (
+   unit varchar(50) not null primary key,
+   active tinyint(1) default 1)
+ENGINE=INNODB;
+
+create table vendor (
+   vendor varchar(200) not null primary key,
+   active tinyint(1) default 1)
+ENGINE=INNODB;
+
+create table feed_purchase (
+   id int not null auto_increment primary key,
+   purch_date date,
+   type varchar(50) not null,
+   subtype varchar(50) not null,
+   animal_group varchar(50) not null,
+   vendor varchar(200) not null,
+   unit varchar(50) not null,
+   purchased numeric(7, 2) not null,
+   price_unit numeric(8, 2) not null,
+   weight_unit numeric(8, 2) not null,
+   comments text,
+   foreign key (unit) references feed_units(unit)
+      on update cascade,
+   foreign key (vendor) references vendor(vendor)
+      on update cascade,
+   foreign key (type) references feed_type(type)
+      on update cascade,
+   foreign key (type, subtype) references feed_subtype(type, subtype)
+      on update cascade)
+ENGINE=INNODB;
+
+create table task (
+   task varchar(50) not null primary key,
+   active tinyint(1) default 1)
+ENGINE=INNODB;
+
+create table task_master (
+   id int not null auto_increment primary key,
+   list_date date,
+   unique(list_date))
+ENGINE=INNODB;
+
+create table task_entry (
+   id int not null auto_increment primary key,
+   m_id int not null,
+   task varchar(50) not null,
+   comments varchar(200),
+   animal_group varchar(50) not null,
+   sub_group varchar(50) not null,
+   workers int not null,
+   minutes int not null,
+   userid varchar(50) not null,
+   complete tinyint(1) default 0,
+   foreign key (userid) references users(username) on update cascade,
+   foreign key (task) references task(task) on update cascade,
+   foreign key (m_id) references task_master(id))
+ENGINE=INNODB;
+
+create table task_recurring (
+   id int not null auto_increment primary key,
+   task varchar(50) not null,
+   start_date date,
+   comments varchar(200),
+   animal_group varchar(50) not null,
+   sub_group varchar(50) not null,
+   userid varchar(50) not null,
+   workers int not null,
+   minutes int not null,
+   recur varchar(15) not null,
+   foreign key (userid) references users(username) on update cascade,
+   foreign key (task) references task(task) on update cascade)
+ENGINE=INNODB;

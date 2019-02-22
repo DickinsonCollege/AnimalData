@@ -1,0 +1,24 @@
+AnimalData installation assumes that:
+  - your web server and database server are the same machine
+  - you are running at least PHP 5.3.3 and MySQL 5.1.67
+  - you know the admin username and password for your MySQL installation
+  - you have an HTTPS certificate, or don't care about passwords/data crossing
+    the network in clear text
+  - you have chosen a username and password for the initial (admin) user
+
+Installation Instructions:
+  1. download the file animal.zip and move it to your document root directory
+  2. execute the command: unzip animal.zip
+     if your server is https://myserver.com, then the URL for accessing 
+     AnmalData will be: https://myserver.com/animal
+  3. execute the command: cd animal
+  4. execute the command: chmod 755 install.sh 
+  5. execute the command: /.install.sh 
+     and supply the requested information when prompted.
+  6. if there were no errors, start using AnimalData at the URL specified in
+     step 2!
+  7. (optional) If you would like to use the recurring tasks functionality
+     within AnimalData, execute the command: crontab -e
+     and add the line: 0 0 * * * php -f /var/www/html/animal/recur.php
+     Note that this assumes that your document root directory is /var/www/html
+     so substitute your actual document root when you make this addition.
